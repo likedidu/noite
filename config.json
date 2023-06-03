@@ -1,53 +1,97 @@
 {
 	"log": {
-		"access": "/dev/null",
-		"error": "/dev/null",
-		"loglevel": "warning"
+	  "level": "info"
 	},
-	"inbounds": [{
-			"port": 10000,
-			"listen": "127.0.0.1",
-			"protocol": "vmess",
-			"settings": {
-				"clients": [{
-					"id": "UUID",
-					"alterId": 0
-				}]
-			},
-			"streamSettings": {
-				"network": "ws",
-				"wsSettings": {
-					"path": "VMESS_WSPATH"
-				}
-			}
+	"dns": {
+	  "servers": [
+		{
+		  "address": "tls://1.1.1.1"
+		}
+	  ],
+	  "strategy": "prefer_ipv4",
+	  "disable_cache": false
+	},
+	"inbounds": [
+	  {
+		"type": "vmess",
+		"listen": "::",
+		"listen_port": 10000,
+		"sniff": true,
+		"sniff_override_destination": true,
+		"users": [
+		  {
+			"uuid": "UUID",
+			"alterId": 0
+		  }
+		],
+		"transport": {
+		  "type": "ws",
+		  "path": "VMESS_WSPATH/vm",
+		  "max_early_data": 2048,
+		  "early_data_header_name": "Sec-WebSocket-Protocol"
+		}
+	  }
+	],
+	"outbounds": [
+	  {
+		"type": "selector",
+		"tag": "Select",
+		"outbounds": [
+		  "Direct",
+		  "WARP",
+		  "Tor"
+		]
+	  },
+	  {
+		"type": "direct",
+		"tag": "Direct",
+		"domain_strategy": "prefer_ipv4"
+	  },
+	  {
+		"type": "wireguard",
+		"tag": "WARP",
+		"server": "engage.cloudflareclient.com",
+		"server_port": 2408,
+		"local_address": ["198.18.0.1/32"],
+		"private_key": "WG_PRIVATE_KEY",
+		"peer_public_key": "bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo="
+	  },
+	  {
+		"type": "socks",
+		"tag": "Tor",
+		"server": "127.0.0.1",
+		"server_port": 9050
+	  }
+	],
+	"route": {
+	  "rules": [
+		{
+		  "geosite": ["tor"],
+		  "outbound": "Tor",
+		  "clash_mode": "rule"
 		},
 		{
-			"port": 20000,
-			"listen": "127.0.0.1",
-			"protocol": "vless",
-			"settings": {
-				"clients": [{
-					"id": "UUID"
-				}],
-				"decryption": "none"
-			},
-			"streamSettings": {
-				"network": "ws",
-				"wsSettings": {
-					"path": "VLESS_WSPATH"
-				}
-			}
+		  "inbound": ["vmess-wg", "trojan-wg"],
+		  "outbound": "WARP",
+		  "clash_mode": "rule"
+		},
+		{
+		  "geosite": ["netflix","disney","openai","bing","imgur"],
+		  "outbound": "WARP",
+		  "clash_mode": "rule"
+		},
+		{
+		  "outbound": "Direct",
+		  "clash_mode": "direct"
 		}
-	],
-	"outbounds": [{
-		"protocol": "freedom",
-		"settings": {}
-	}],
-	"dns": {
-		"server": [
-			"8.8.8.8",
-			"8.8.4.4",
-			"localhost"
-		]
+	  ],
+	  "final": "Select"
+	},
+	"experimental": {
+	  "clash_api": {
+		"external_controller": "127.0.0.1:61804",
+		"secret": "PASSWORD",
+		"default_mode": "rule"
+	  }
 	}
-}
+  }
