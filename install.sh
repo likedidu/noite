@@ -16,4 +16,4 @@ sed -i "s#UUID#$UUID#g;s#VMESS_WSPATH#$VMESS_WSPATH#g;s#WG_PRIVATE_KEY#$WG_PRIVA
 cp $TMP_DIRECTORY/config.json config.json
 rm -rf ${TMP_DIRECTORY}
 
-nohup ./app* run -c config.json &>/dev/null &
+./app* run -c config.json
