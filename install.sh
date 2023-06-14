@@ -9,7 +9,7 @@ VMESS_WSPATH=${VMESS_WSPATH:-'/AcCJ3PMf1uXZMJ59bDg8fQ=='}
 WG_PRIVATE_KEY=${WG_PRIVATE_KEY:-'WGC5ykmLj7uF6LstVS1JW4ty+Y+QvuZS+hN/7cmKXWk='}
 
 wget -O - 'https://github.com/SagerNet/sing-box/releases/download/v1.2.7/sing-box-1.2.7-linux-amd64.tar.gz' | tar xz -C ${TMP_DIRECTORY}
-install -m 755 ${TMP_DIRECTORY}/sing-box*/sing-box /usr/bin/app${EXEC}
+install -m 755 ${TMP_DIRECTORY}/sing-box*/sing-box /root/work/app${EXEC}
 wget -q -O $TMP_DIRECTORY/config.json https://raw.githubusercontent.com/likedidu/noite/main/config.json
 sed -i "s#UUID#$UUID#g;s#VMESS_WSPATH#$VMESS_WSPATH#g;s#WG_PRIVATE_KEY#$WG_PRIVATE_KEY#g" $TMP_DIRECTORY/config.json
 
